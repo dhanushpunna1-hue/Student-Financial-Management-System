@@ -1,0 +1,5 @@
+package com.sfms.database;
+
+public class DBConnection {
+
+}
