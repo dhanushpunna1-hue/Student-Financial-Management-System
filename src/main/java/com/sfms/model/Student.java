@@ -1,43 +1,45 @@
 package com.sfms.model;
 
 public class Student {
-
     private int studentId;
     private String rollNumber;
     private String fullName;
     private String email;
-    private String department;
-    private String academicYear;
-    private String phoneNumber;
+    private String phone;
+    private String course;
+    private String studyYear;
 
-    // Default constructor
     public Student() {
     }
 
-    // Constructor for adding a student
-    public Student(String rollNumber, String fullName,
-            String email, String department,
-            String academicYear, String phoneNumber) {
-        this.rollNumber = rollNumber;
+    // Constructor used by your existing student features
+    public Student(int studentId, String fullName, String email,
+                   String phone, String course, String studyYear) {
+        this.studentId = studentId;
         this.fullName = fullName;
         this.email = email;
-        this.department = department;
-        this.academicYear = academicYear;
-        this.phoneNumber = phoneNumber;
+        this.phone = phone;
+        this.course = course;
+        this.studyYear = studyYear;
     }
 
-    // Constructor for retrieving a student with ID
-    public Student(int studentId, String rollNumber,
-            String fullName, String email,
-            String department, String academicYear,
-            String phoneNumber) {
-        this.studentId = studentId;
+    // Constructor used by the incoming student management features
+    public Student(String rollNumber, String fullName, String email,
+                   String department, String academicYear, String phoneNumber) {
         this.rollNumber = rollNumber;
         this.fullName = fullName;
         this.email = email;
-        this.department = department;
-        this.academicYear = academicYear;
-        this.phoneNumber = phoneNumber;
+        this.course = department;
+        this.studyYear = academicYear;
+        this.phone = phoneNumber;
+    }
+
+    // Constructor used when loading a student with an ID
+    public Student(int studentId, String rollNumber, String fullName,
+                   String email, String department, String academicYear,
+                   String phoneNumber) {
+        this(rollNumber, fullName, email, department, academicYear, phoneNumber);
+        this.studentId = studentId;
     }
 
     public int getStudentId() {
@@ -72,27 +74,51 @@ public class Student {
         this.email = email;
     }
 
-    public String getDepartment() {
-        return department;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
-    }
-
-    public String getAcademicYear() {
-        return academicYear;
-    }
-
-    public void setAcademicYear(String academicYear) {
-        this.academicYear = academicYear;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getPhoneNumber() {
-        return phoneNumber;
+        return phone;
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        this.phone = phoneNumber;
+    }
+
+    public String getCourse() {
+        return course;
+    }
+
+    public void setCourse(String course) {
+        this.course = course;
+    }
+
+    public String getDepartment() {
+        return course;
+    }
+
+    public void setDepartment(String department) {
+        this.course = department;
+    }
+
+    public String getStudyYear() {
+        return studyYear;
+    }
+
+    public void setStudyYear(String studyYear) {
+        this.studyYear = studyYear;
+    }
+
+    public String getAcademicYear() {
+        return studyYear;
+    }
+
+    public void setAcademicYear(String academicYear) {
+        this.studyYear = academicYear;
     }
 }
