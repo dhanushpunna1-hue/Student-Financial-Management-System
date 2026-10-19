@@ -3,165 +3,99 @@ package com.sfms.service;
 import com.sfms.dao.ScholarshipDAO;
 import com.sfms.model.Scholarship;
 
+import java.sql.Date;
 import java.util.List;
 
 public class ScholarshipService {
+    private final ScholarshipDAO scholarshipDAO = new ScholarshipDAO();
 
-    private final ScholarshipDAO scholarshipDAO;
-
-    public ScholarshipService() {
-        scholarshipDAO = new ScholarshipDAO();
+    public void addScholarship(int studentId, String scholarshipName, double amount,
+            String academicYear, String status, Date awardedDate) {
+        if (!validFields(studentId, scholarshipName, amount, academicYear, status)) return;
+        scholarshipDAO.addScholarship(new Scholarship(studentId, scholarshipName.trim(), amount,
+                academicYear.trim(), normalizeStatus(status), awardedDate));
     }
 
-    // Add scholarship after validation
-    public void addScholarship(int studentId,
-            String scholarshipName,
-            double amount,
-            String academicYear,
-            String status,
-            String description) {
-
-        if (studentId <= 0) {
-            System.out.println("Student ID must be greater than 0.");
-            return;
-        }
-
-        if (scholarshipName == null ||
-                scholarshipName.trim().isEmpty()) {
-            System.out.println("Scholarship name cannot be empty.");
-            return;
-        }
-
-        if (amount <= 0) {
-            System.out.println("Scholarship amount must be greater than 0.");
-            return;
-        }
-
-        if (academicYear == null ||
-                academicYear.trim().isEmpty()) {
-            System.out.println("Academic year cannot be empty.");
-            return;
-        }
-
-        if (!isValidStatus(status)) {
-            System.out.println("Status must be Pending, Approved, or Rejected.");
-            return;
-        }
-
-        Scholarship scholarship = new Scholarship(
-                studentId,
-                scholarshipName.trim(),
-                amount,
-                academicYear.trim(),
-                status,
-                description);
-
-        scholarshipDAO.addScholarship(scholarship);
+    /** Compatibility overload for older callers; description is no longer stored. */
+    public void addScholarship(int studentId, String scholarshipName, double amount,
+            String academicYear, String status, String ignoredDescription) {
+        addScholarship(studentId, scholarshipName, amount, academicYear, status, (Date) null);
     }
 
-    // Display all scholarships
+    public List<Scholarship> getAllScholarships() {
+        return scholarshipDAO.getAllScholarships();
+    }
+
     public void viewAllScholarships() {
-
-        List<Scholarship> scholarships = scholarshipDAO.getAllScholarships();
-
+        List<Scholarship> scholarships = getAllScholarships();
         if (scholarships.isEmpty()) {
             System.out.println("No scholarships found.");
             return;
         }
-
-        System.out.println("\n========== SCHOLARSHIPS ==========");
-
         for (Scholarship scholarship : scholarships) {
-
-            System.out.println("Scholarship ID : "
-                    + scholarship.getScholarshipId());
-
-            System.out.println("Student ID     : "
-                    + scholarship.getStudentId());
-
-            System.out.println("Name           : "
-                    + scholarship.getScholarshipName());
-
-            System.out.println("Amount         : ₹"
-                    + scholarship.getAmount());
-
-            System.out.println("Academic Year  : "
-                    + scholarship.getAcademicYear());
-
-            System.out.println("Status         : "
-                    + scholarship.getStatus());
-
-            System.out.println("Description    : "
-                    + scholarship.getDescription());
-
-            System.out.println("-----------------------------------");
+            System.out.printf("%d | %d | %s | ₹%.2f | %s | %s | %s%n",
+                    scholarship.getScholarshipId(), scholarship.getStudentId(),
+                    scholarship.getScholarshipName(), scholarship.getAmount(),
+                    scholarship.getAcademicYear(), scholarship.getStatus(),
+                    scholarship.getAwardedDate() == null ? "-" : scholarship.getAwardedDate());
         }
     }
 
-    // Update scholarship
-    public void updateScholarship(int scholarshipId,
-            int studentId,
-            String scholarshipName,
-            double amount,
-            String academicYear,
-            String status,
-            String description) {
-
-        if (scholarshipId <= 0 || studentId <= 0) {
-            System.out.println("Invalid scholarship ID or student ID.");
-            return;
-        }
-
-        if (scholarshipName == null ||
-                scholarshipName.trim().isEmpty()) {
-            System.out.println("Scholarship name cannot be empty.");
-            return;
-        }
-
-        if (amount <= 0) {
-            System.out.println("Scholarship amount must be greater than 0.");
-            return;
-        }
-
-        if (academicYear == null ||
-                academicYear.trim().isEmpty()) {
-            System.out.println("Academic year cannot be empty.");
-            return;
-        }
-
-        if (!isValidStatus(status)) {
-            System.out.println("Invalid scholarship status.");
-            return;
-        }
-
-        Scholarship scholarship = new Scholarship(
-                scholarshipId,
-                studentId,
-                scholarshipName.trim(),
-                amount,
-                academicYear.trim(),
-                status,
-                description);
-
-        scholarshipDAO.updateScholarship(scholarship);
-    }
-
-    // Delete scholarship
-    public void deleteScholarship(int scholarshipId) {
-
+    public void updateScholarship(int scholarshipId, int studentId, String scholarshipName,
+            double amount, String academicYear, String status, Date awardedDate) {
         if (scholarshipId <= 0) {
             System.out.println("Invalid scholarship ID.");
             return;
         }
+        if (!validFields(studentId, scholarshipName, amount, academicYear, status)) return;
+        scholarshipDAO.updateScholarship(new Scholarship(scholarshipId, studentId,
+                scholarshipName.trim(), amount, academicYear.trim(), normalizeStatus(status), awardedDate));
+    }
 
+    /** Compatibility overload for older callers; description is no longer stored. */
+    public void updateScholarship(int scholarshipId, int studentId, String scholarshipName,
+            double amount, String academicYear, String status, String ignoredDescription) {
+        updateScholarship(scholarshipId, studentId, scholarshipName, amount,
+                academicYear, status, (Date) null);
+    }
+
+    public void deleteScholarship(int scholarshipId) {
+        if (scholarshipId <= 0) {
+            System.out.println("Invalid scholarship ID.");
+            return;
+        }
         scholarshipDAO.deleteScholarship(scholarshipId);
     }
 
-    private boolean isValidStatus(String status) {
+    private boolean validFields(int studentId, String name, double amount, String year, String status) {
+        if (studentId <= 0) {
+            System.out.println("Student ID must be greater than 0.");
+            return false;
+        }
+        if (name == null || name.isBlank()) {
+            System.out.println("Scholarship name cannot be empty.");
+            return false;
+        }
+        if (amount <= 0 || !Double.isFinite(amount)) {
+            System.out.println("Scholarship amount must be a valid positive number.");
+            return false;
+        }
+        if (year == null || year.isBlank() || year.length() > 9) {
+            System.out.println("Academic year is required and must be at most 9 characters.");
+            return false;
+        }
+        if (normalizeStatus(status) == null) {
+            System.out.println("Status must be Pending, Approved, or Rejected.");
+            return false;
+        }
+        return true;
+    }
 
-        return status != null &&
-                (status.equalsIgnoreCase("Pending") ||
-                        status.equalsIgnoreCase("Approved") ||
-                        status.equalsIgnoreCase("Rejected"));
+    private String normalizeStatus(String status) {
+        if (status == null) return null;
+        if (status.equalsIgnoreCase("Pending")) return "Pending";
+        if (status.equalsIgnoreCase("Approved")) return "Approved";
+        if (status.equalsIgnoreCase("Rejected")) return "Rejected";
+        return null;
     }
 }

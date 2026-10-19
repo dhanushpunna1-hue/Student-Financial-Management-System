@@ -12,9 +12,8 @@ public class PaymentDAO {
     // ADD PAYMENT
     public void addPayment(Payment payment) {
 
-        String sql = "INSERT INTO payment " +
-                "(fee_structure_id, amount, payment_date, payment_method, transaction_reference) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO payments (fee_id, amount_paid, payment_date) " +
+                "VALUES (?, ?, ?)";
 
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -22,8 +21,6 @@ public class PaymentDAO {
             statement.setInt(1, payment.getFeeStructureId());
             statement.setDouble(2, payment.getAmount());
             statement.setDate(3, Date.valueOf(payment.getPaymentDate()));
-            statement.setString(4, payment.getPaymentMethod());
-            statement.setString(5, payment.getTransactionReference());
 
             statement.executeUpdate();
 
@@ -40,7 +37,7 @@ public class PaymentDAO {
 
         List<Payment> payments = new ArrayList<>();
 
-        String sql = "SELECT * FROM payment";
+        String sql = "SELECT payment_id, fee_id, amount_paid, payment_date FROM payments";
 
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql);
@@ -50,11 +47,11 @@ public class PaymentDAO {
 
                 Payment payment = new Payment(
                         resultSet.getInt("payment_id"),
-                        resultSet.getInt("fee_structure_id"),
-                        resultSet.getDouble("amount"),
+                        resultSet.getInt("fee_id"),
+                        resultSet.getDouble("amount_paid"),
                         resultSet.getDate("payment_date").toLocalDate(),
-                        resultSet.getString("payment_method"),
-                        resultSet.getString("transaction_reference"));
+                        null,
+                        null);
 
                 payments.add(payment);
             }
@@ -70,7 +67,7 @@ public class PaymentDAO {
     // DELETE PAYMENT
     public void deletePayment(int paymentId) {
 
-        String sql = "DELETE FROM payment WHERE payment_id = ?";
+        String sql = "DELETE FROM payments WHERE payment_id = ?";
 
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql)) {

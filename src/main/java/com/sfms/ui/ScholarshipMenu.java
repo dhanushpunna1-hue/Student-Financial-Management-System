@@ -1,6 +1,7 @@
 package com.sfms.ui;
 
 import com.sfms.service.ScholarshipService;
+import java.sql.Date;
 import java.util.Scanner;
 
 public class ScholarshipMenu {
@@ -83,14 +84,14 @@ public class ScholarshipMenu {
             System.out.print("Enter status (Pending/Approved/Rejected): ");
             String status = scanner.nextLine();
 
-            System.out.print("Enter description: ");
-            String description = scanner.nextLine();
+            System.out.print("Awarded date (YYYY-MM-DD, blank if none): ");
+            Date awardedDate = readOptionalDate();
 
             service.addScholarship(
-                    studentId, name, amount, year, status, description);
+                    studentId, name, amount, year, status, awardedDate);
 
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid number entered.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid number or date. Use YYYY-MM-DD for awarded date.");
         }
     }
 
@@ -117,15 +118,15 @@ public class ScholarshipMenu {
             System.out.print("Enter status (Pending/Approved/Rejected): ");
             String status = scanner.nextLine();
 
-            System.out.print("Enter description: ");
-            String description = scanner.nextLine();
+            System.out.print("Awarded date (YYYY-MM-DD, blank if none): ");
+            Date awardedDate = readOptionalDate();
 
             service.updateScholarship(
                     scholarshipId, studentId, name, amount,
-                    year, status, description);
+                    year, status, awardedDate);
 
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid number entered.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid number or date. Use YYYY-MM-DD for awarded date.");
         }
     }
 
@@ -140,5 +141,10 @@ public class ScholarshipMenu {
         } catch (NumberFormatException e) {
             System.out.println("Invalid scholarship ID.");
         }
+    }
+
+    private Date readOptionalDate() {
+        String value = scanner.nextLine().trim();
+        return value.isEmpty() ? null : Date.valueOf(value);
     }
 }

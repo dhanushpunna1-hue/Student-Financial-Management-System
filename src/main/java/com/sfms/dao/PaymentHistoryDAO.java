@@ -6,13 +6,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.math.BigDecimal;
 
 public class PaymentHistoryDAO {
 
     // Display all previous payments
     public void viewPaymentHistory() {
 
-        String sql = "SELECT * FROM payment ORDER BY payment_date DESC";
+        String sql = "SELECT payment_id, fee_id, amount_paid, payment_date " +
+                "FROM payments ORDER BY payment_date DESC";
 
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql);
@@ -29,20 +31,14 @@ public class PaymentHistoryDAO {
                 System.out.println("Payment ID     : "
                         + resultSet.getInt("payment_id"));
 
-                System.out.println("Fee Structure ID: "
-                        + resultSet.getInt("fee_structure_id"));
+                System.out.println("Fee ID         : "
+                        + resultSet.getInt("fee_id"));
 
                 System.out.println("Amount         : ₹"
-                        + resultSet.getBigDecimal("amount"));
+                        + resultSet.getBigDecimal("amount_paid"));
 
                 System.out.println("Payment Date   : "
                         + resultSet.getDate("payment_date"));
-
-                System.out.println("Payment Method : "
-                        + resultSet.getString("payment_method"));
-
-                System.out.println("Transaction Ref: "
-                        + resultSet.getString("transaction_reference"));
 
                 System.out.println("--------------------------------------");
             }
@@ -59,21 +55,24 @@ public class PaymentHistoryDAO {
 
     // Calculate total amount paid
     public void viewTotalPayments() {
+        System.out.println("\nTotal Payments Received: ₹" + getTotalPayments());
+    }
 
-        String sql = "SELECT COALESCE(SUM(amount), 0) AS total FROM payment";
+    public BigDecimal getTotalPayments() {
+        String sql = "SELECT COALESCE(SUM(amount_paid), 0) AS total FROM payments";
 
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql);
                 ResultSet resultSet = statement.executeQuery()) {
 
             if (resultSet.next()) {
-                System.out.println("\nTotal Payments Received: ₹"
-                        + resultSet.getBigDecimal("total"));
+                BigDecimal total = resultSet.getBigDecimal("total");
+                return total == null ? BigDecimal.ZERO : total;
             }
+            return BigDecimal.ZERO;
 
         } catch (SQLException e) {
-            System.out.println("Error calculating total payments!");
-            e.printStackTrace();
+            throw new IllegalStateException("Could not retrieve total payments.", e);
         }
     }
 }

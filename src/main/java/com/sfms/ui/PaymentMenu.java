@@ -62,7 +62,7 @@ public class PaymentMenu {
 
         System.out.println("\n--- Add Payment ---");
 
-        System.out.print("Enter fee structure ID: ");
+        System.out.print("Enter fee ID (from the fees table): ");
         int feeStructureId = scanner.nextInt();
 
         System.out.print("Enter payment amount: ");
@@ -82,18 +82,10 @@ public class PaymentMenu {
             return;
         }
 
-        System.out.print("Enter payment method: ");
-        String paymentMethod = scanner.nextLine();
-
-        System.out.print("Enter transaction reference: ");
-        String transactionReference = scanner.nextLine();
-
         service.addPayment(
                 feeStructureId,
                 amount,
-                paymentDate,
-                paymentMethod,
-                transactionReference);
+                paymentDate);
     }
 
     private void deletePayment() {

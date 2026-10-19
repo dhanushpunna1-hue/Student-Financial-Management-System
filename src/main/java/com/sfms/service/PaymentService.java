@@ -17,16 +17,14 @@ public class PaymentService {
     // Add payment
     public void addPayment(int feeStructureId,
             double amount,
-            LocalDate paymentDate,
-            String paymentMethod,
-            String transactionReference) {
+            LocalDate paymentDate) {
 
         if (feeStructureId <= 0) {
             System.out.println("Invalid fee structure ID.");
             return;
         }
 
-        if (amount <= 0) {
+        if (amount <= 0 || !Double.isFinite(amount)) {
             System.out.println("Payment amount must be greater than 0.");
             return;
         }
@@ -36,27 +34,19 @@ public class PaymentService {
             return;
         }
 
-        if (paymentMethod == null ||
-                paymentMethod.trim().isEmpty()) {
-
-            System.out.println("Payment method cannot be empty.");
-            return;
-        }
-
         Payment payment = new Payment(
                 feeStructureId,
                 amount,
                 paymentDate,
-                paymentMethod,
-                transactionReference);
+                null,
+                null);
 
         paymentDAO.addPayment(payment);
     }
 
     // View all payments
     public void viewAllPayments() {
-
-        List<Payment> payments = paymentDAO.getAllPayments();
+        List<Payment> payments = getAllPayments();
 
         if (payments.isEmpty()) {
             System.out.println("No payments found.");
@@ -70,7 +60,7 @@ public class PaymentService {
             System.out.println("Payment ID          : "
                     + payment.getPaymentId());
 
-            System.out.println("Fee Structure ID    : "
+            System.out.println("Fee ID              : "
                     + payment.getFeeStructureId());
 
             System.out.println("Amount              : ₹"
@@ -79,14 +69,12 @@ public class PaymentService {
             System.out.println("Payment Date        : "
                     + payment.getPaymentDate());
 
-            System.out.println("Payment Method      : "
-                    + payment.getPaymentMethod());
-
-            System.out.println("Transaction Ref.    : "
-                    + payment.getTransactionReference());
-
             System.out.println("-------------------------------------");
         }
+    }
+
+    public List<Payment> getAllPayments() {
+        return paymentDAO.getAllPayments();
     }
 
     // Delete payment

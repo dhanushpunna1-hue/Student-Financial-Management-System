@@ -20,32 +20,27 @@ public class PendingFeeDAO {
         String sql = """
                 SELECT
                     s.student_id,
-                    s.roll_number,
                     s.full_name,
-                    fs.fee_structure_id,
-                    fs.fee_name,
-                    sf.total_amount,
-                    COALESCE(SUM(p.amount), 0) AS paid_amount,
-                    sf.total_amount - COALESCE(SUM(p.amount), 0)
+                    f.fee_id,
+                    f.fee_name,
+                    f.amount AS total_amount,
+                    COALESCE(SUM(p.amount_paid), 0) AS paid_amount,
+                    GREATEST(f.amount - COALESCE(SUM(p.amount_paid), 0), 0)
                         AS pending_amount,
-                    sf.due_date
-                FROM student_fee sf
-                JOIN student s
-                    ON sf.student_id = s.student_id
-                JOIN fee_structure fs
-                    ON sf.fee_structure_id = fs.fee_structure_id
-                LEFT JOIN payment p
-                    ON p.student_fee_id = sf.student_fee_id
+                    f.due_date
+                FROM fees f
+                JOIN students s
+                    ON f.student_id = s.student_id
+                LEFT JOIN payments p
+                    ON p.fee_id = f.fee_id
                 GROUP BY
-                    sf.student_fee_id,
                     s.student_id,
-                    s.roll_number,
                     s.full_name,
-                    fs.fee_structure_id,
-                    fs.fee_name,
-                    sf.total_amount,
-                    sf.due_date
-                ORDER BY s.roll_number
+                    f.fee_id,
+                    f.fee_name,
+                    f.amount,
+                    f.due_date
+                ORDER BY s.student_id, f.due_date, f.fee_id
                 """;
 
         try (Connection connection = DBConnection.getConnection();
@@ -57,11 +52,10 @@ public class PendingFeeDAO {
                 PendingFee fee = new PendingFee();
 
                 fee.setStudentId(resultSet.getInt("student_id"));
-                fee.setRollNumber(resultSet.getString("roll_number"));
                 fee.setStudentName(resultSet.getString("full_name"));
 
                 fee.setFeeStructureId(
-                        resultSet.getInt("fee_structure_id"));
+                        resultSet.getInt("fee_id"));
 
                 fee.setFeeName(resultSet.getString("fee_name"));
 

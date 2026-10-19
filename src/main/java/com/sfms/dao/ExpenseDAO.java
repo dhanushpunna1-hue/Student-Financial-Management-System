@@ -16,17 +16,17 @@ public class ExpenseDAO {
     public void addExpense(Expense expense) {
 
         String sql = "INSERT INTO expenses " +
-                "(expense_name, category, amount, expense_date, description) " +
+                "(student_id, expense_name, amount, expense_date, notes) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, expense.getExpenseName());
-            statement.setString(2, expense.getCategory());
+            statement.setInt(1, expense.getStudentId());
+            statement.setString(2, expense.getExpenseName());
             statement.setDouble(3, expense.getAmount());
             statement.setDate(4, expense.getExpenseDate());
-            statement.setString(5, expense.getDescription());
+            statement.setString(5, expense.getNotes());
 
             statement.executeUpdate();
 
@@ -53,11 +53,11 @@ public class ExpenseDAO {
 
                 Expense expense = new Expense(
                         resultSet.getInt("expense_id"),
+                        resultSet.getInt("student_id"),
                         resultSet.getString("expense_name"),
-                        resultSet.getString("category"),
                         resultSet.getDouble("amount"),
                         resultSet.getDate("expense_date"),
-                        resultSet.getString("description"));
+                        resultSet.getString("notes"));
 
                 expenses.add(expense);
             }
@@ -74,18 +74,18 @@ public class ExpenseDAO {
     public void updateExpense(Expense expense) {
 
         String sql = "UPDATE expenses SET " +
-                "expense_name = ?, category = ?, amount = ?, " +
-                "expense_date = ?, description = ? " +
+                "student_id = ?, expense_name = ?, amount = ?, " +
+                "expense_date = ?, notes = ? " +
                 "WHERE expense_id = ?";
 
         try (Connection connection = DBConnection.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setString(1, expense.getExpenseName());
-            statement.setString(2, expense.getCategory());
+            statement.setInt(1, expense.getStudentId());
+            statement.setString(2, expense.getExpenseName());
             statement.setDouble(3, expense.getAmount());
             statement.setDate(4, expense.getExpenseDate());
-            statement.setString(5, expense.getDescription());
+            statement.setString(5, expense.getNotes());
             statement.setInt(6, expense.getExpenseId());
 
             int rows = statement.executeUpdate();

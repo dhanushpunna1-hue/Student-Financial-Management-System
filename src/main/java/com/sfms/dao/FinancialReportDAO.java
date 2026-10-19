@@ -13,8 +13,8 @@ public class FinancialReportDAO {
     // Get total payments within a date range
     public double getTotalPayments(Date startDate, Date endDate) {
 
-        String sql = "SELECT COALESCE(SUM(amount), 0) AS total " +
-                "FROM payment " +
+        String sql = "SELECT COALESCE(SUM(amount_paid), 0) AS total " +
+                "FROM payments " +
                 "WHERE payment_date BETWEEN ? AND ?";
 
         try (Connection connection = DBConnection.getConnection();

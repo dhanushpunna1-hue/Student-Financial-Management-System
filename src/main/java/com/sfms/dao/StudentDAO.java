@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -268,6 +269,10 @@ public class StudentDAO {
 
             statement.setInt(1, studentId);
             return statement.executeUpdate() > 0;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("Cannot delete: this student has linked fee, payment, or "
+                    + "scholarship records. Keep the student record to preserve history.");
+            return false;
         } catch (SQLException e) {
             System.out.println("Error deleting student: " + e.getMessage());
             return false;

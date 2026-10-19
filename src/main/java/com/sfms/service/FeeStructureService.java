@@ -3,115 +3,68 @@ package com.sfms.service;
 import com.sfms.dao.FeeStructureDAO;
 import com.sfms.model.FeeStructure;
 
+import java.sql.Date;
 import java.util.List;
 
 public class FeeStructureService {
+    private final FeeStructureDAO feeStructureDAO = new FeeStructureDAO();
 
-    private final FeeStructureDAO feeStructureDAO;
-
-    public FeeStructureService() {
-        feeStructureDAO = new FeeStructureDAO();
-    }
-
-    // Add fee structure
-    public void addFee(String feeName, double amount,
-            String academicYear, String description) {
-
-        if (feeName == null || feeName.trim().isEmpty()) {
+    public void addFee(int studentId, String feeName, double amount, Date dueDate) {
+        if (studentId <= 0) {
+            System.out.println("Enter a valid student ID.");
+            return;
+        }
+        if (feeName == null || feeName.isBlank()) {
             System.out.println("Fee name cannot be empty.");
             return;
         }
-
-        if (amount <= 0) {
-            System.out.println("Fee amount must be greater than 0.");
+        if (amount <= 0 || !Double.isFinite(amount)) {
+            System.out.println("Fee amount must be a valid positive number.");
             return;
         }
-
-        if (academicYear == null || academicYear.trim().isEmpty()) {
-            System.out.println("Academic year cannot be empty.");
-            return;
-        }
-
-        FeeStructure fee = new FeeStructure(
-                feeName,
-                amount,
-                academicYear,
-                description);
-
-        feeStructureDAO.addFeeStructure(fee);
+        feeStructureDAO.addFeeStructure(new FeeStructure(studentId, feeName.trim(), amount, dueDate));
     }
 
-    // View all fee structures
+    public List<FeeStructure> getAllFees() {
+        return feeStructureDAO.getAllFeeStructures();
+    }
+
     public void viewAllFees() {
-
-        List<FeeStructure> fees = feeStructureDAO.getAllFeeStructures();
-
+        List<FeeStructure> fees = getAllFees();
         if (fees.isEmpty()) {
-            System.out.println("No fee structures found.");
+            System.out.println("No fee records found.");
             return;
         }
-
-        System.out.println("\n========== FEE STRUCTURES ==========");
-
+        System.out.println("FEE ID | STUDENT ID | FEE NAME | AMOUNT | DUE DATE");
         for (FeeStructure fee : fees) {
-
-            System.out.println("ID          : "
-                    + fee.getFeeStructureId());
-
-            System.out.println("Fee Name    : "
-                    + fee.getFeeName());
-
-            System.out.println("Amount      : ₹"
-                    + fee.getAmount());
-
-            System.out.println("Academic Year: "
-                    + fee.getAcademicYear());
-
-            System.out.println("Description : "
-                    + fee.getDescription());
-
-            System.out.println("------------------------------------");
+            System.out.printf("%d | %d | %s | ₹%.2f | %s%n",
+                    fee.getFeeId(), fee.getStudentId(), fee.getFeeName(),
+                    fee.getAmount(), fee.getDueDate() == null ? "-" : fee.getDueDate());
         }
     }
 
-    // Update fee structure
-    public void updateFee(int id, String feeName,
-            double amount, String academicYear,
-            String description) {
-
-        if (id <= 0) {
-            System.out.println("Invalid fee ID.");
+    public void updateFee(int feeId, int studentId, String feeName, double amount, Date dueDate) {
+        if (feeId <= 0 || studentId <= 0) {
+            System.out.println("Enter valid fee and student IDs.");
             return;
         }
-
-        if (feeName == null || feeName.trim().isEmpty()) {
+        if (feeName == null || feeName.isBlank()) {
             System.out.println("Fee name cannot be empty.");
             return;
         }
-
-        if (amount <= 0) {
-            System.out.println("Fee amount must be greater than 0.");
+        if (amount <= 0 || !Double.isFinite(amount)) {
+            System.out.println("Fee amount must be a valid positive number.");
             return;
         }
-
-        FeeStructure fee = new FeeStructure(
-                id,
-                feeName,
-                amount,
-                academicYear,
-                description);
-
-        feeStructureDAO.updateFeeStructure(fee);
+        feeStructureDAO.updateFeeStructure(
+                new FeeStructure(feeId, studentId, feeName.trim(), amount, dueDate));
     }
 
-    // Delete fee structure
-    public void deleteFee(int id) {
-
-        if (id <= 0) {
+    public void deleteFee(int feeId) {
+        if (feeId <= 0) {
             System.out.println("Invalid fee ID.");
             return;
         }
-
-        feeStructureDAO.deleteFeeStructure(id);
+        feeStructureDAO.deleteFeeStructure(feeId);
     }
 }

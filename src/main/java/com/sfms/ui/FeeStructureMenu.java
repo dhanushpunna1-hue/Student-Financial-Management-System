@@ -1,127 +1,67 @@
 package com.sfms.ui;
 
 import com.sfms.service.FeeStructureService;
-
+import java.sql.Date;
 import java.util.Scanner;
 
 public class FeeStructureMenu {
-
-    private final Scanner scanner;
-    private final FeeStructureService service;
-
-    public FeeStructureMenu() {
-        scanner = new Scanner(System.in);
-        service = new FeeStructureService();
-    }
+    private final Scanner scanner = new Scanner(System.in);
+    private final FeeStructureService service = new FeeStructureService();
 
     public void start() {
-
         while (true) {
-
-            System.out.println("\n================================");
-            System.out.println("        FEE STRUCTURE");
-            System.out.println("================================");
-            System.out.println("1. Add Fee Structure");
-            System.out.println("2. View Fee Structures");
-            System.out.println("3. Update Fee Structure");
-            System.out.println("4. Delete Fee Structure");
-            System.out.println("5. Exit");
-            System.out.println("================================");
-
-            System.out.print("Enter your choice: ");
-
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-
-                case 1:
-                    addFee();
-                    break;
-
-                case 2:
-                    service.viewAllFees();
-                    break;
-
-                case 3:
-                    updateFee();
-                    break;
-
-                case 4:
-                    deleteFee();
-                    break;
-
-                case 5:
-                    System.out.println("Exiting Fee Structure module...");
-                    return;
-
-                default:
-                    System.out.println("Invalid choice. Try again.");
+            System.out.println("\n===== FEES =====");
+            System.out.println("1. Add Fee\n2. View Fees\n3. Update Fee\n4. Delete Fee\n5. Exit");
+            System.out.print("Choose: ");
+            String choice = scanner.nextLine().trim();
+            try {
+                switch (choice) {
+                    case "1" -> addFee();
+                    case "2" -> service.viewAllFees();
+                    case "3" -> updateFee();
+                    case "4" -> deleteFee();
+                    case "5" -> { return; }
+                    default -> System.out.println("Choose a number from 1 to 5.");
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid number or date. Use whole numbers and YYYY-MM-DD.");
             }
         }
     }
 
     private void addFee() {
-
-        System.out.println("\n--- Add Fee Structure ---");
-
-        System.out.print("Enter fee name: ");
-        String feeName = scanner.nextLine();
-
-        System.out.print("Enter amount: ");
-        double amount = scanner.nextDouble();
-        scanner.nextLine();
-
-        System.out.print("Enter academic year: ");
-        String academicYear = scanner.nextLine();
-
-        System.out.print("Enter description: ");
-        String description = scanner.nextLine();
-
-        service.addFee(
-                feeName,
-                amount,
-                academicYear,
-                description);
+        System.out.print("Student ID: ");
+        int studentId = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Fee name: ");
+        String name = scanner.nextLine().trim();
+        System.out.print("Amount: ");
+        double amount = Double.parseDouble(scanner.nextLine().trim());
+        System.out.print("Due date (YYYY-MM-DD, blank if none): ");
+        Date dueDate = readOptionalDate();
+        service.addFee(studentId, name, amount, dueDate);
     }
 
     private void updateFee() {
+        System.out.print("Fee ID: ");
+        int feeId = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Student ID: ");
+        int studentId = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Fee name: ");
+        String name = scanner.nextLine().trim();
+        System.out.print("Amount: ");
+        double amount = Double.parseDouble(scanner.nextLine().trim());
+        System.out.print("Due date (YYYY-MM-DD, blank if none): ");
+        Date dueDate = readOptionalDate();
+        service.updateFee(feeId, studentId, name, amount, dueDate);
+    }
 
-        System.out.println("\n--- Update Fee Structure ---");
-
-        System.out.print("Enter fee ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-
-        System.out.print("Enter new fee name: ");
-        String feeName = scanner.nextLine();
-
-        System.out.print("Enter new amount: ");
-        double amount = scanner.nextDouble();
-        scanner.nextLine();
-
-        System.out.print("Enter new academic year: ");
-        String academicYear = scanner.nextLine();
-
-        System.out.print("Enter new description: ");
-        String description = scanner.nextLine();
-
-        service.updateFee(
-                id,
-                feeName,
-                amount,
-                academicYear,
-                description);
+    private Date readOptionalDate() {
+        String value = scanner.nextLine().trim();
+        return value.isEmpty() ? null : Date.valueOf(value);
     }
 
     private void deleteFee() {
-
-        System.out.println("\n--- Delete Fee Structure ---");
-
-        System.out.print("Enter fee ID: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-
-        service.deleteFee(id);
+        System.out.print("Fee ID: ");
+        service.deleteFee(Integer.parseInt(scanner.nextLine().trim()));
     }
 }

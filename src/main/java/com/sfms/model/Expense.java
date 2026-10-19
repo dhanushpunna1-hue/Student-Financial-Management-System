@@ -5,36 +5,32 @@ import java.sql.Date;
 public class Expense {
 
     private int expenseId;
+    private int studentId;
     private String expenseName;
-    private String category;
     private double amount;
     private Date expenseDate;
-    private String description;
+    private String notes;
 
     public Expense() {
     }
 
-    public Expense(String expenseName, String category,
-            double amount, Date expenseDate,
-            String description) {
-
+    public Expense(int studentId, String expenseName, double amount,
+            Date expenseDate, String notes) {
+        this.studentId = studentId;
         this.expenseName = expenseName;
-        this.category = category;
         this.amount = amount;
         this.expenseDate = expenseDate;
-        this.description = description;
+        this.notes = notes;
     }
 
-    public Expense(int expenseId, String expenseName,
-            String category, double amount,
-            Date expenseDate, String description) {
-
+    public Expense(int expenseId, int studentId, String expenseName,
+            double amount, Date expenseDate, String notes) {
         this.expenseId = expenseId;
+        this.studentId = studentId;
         this.expenseName = expenseName;
-        this.category = category;
         this.amount = amount;
         this.expenseDate = expenseDate;
-        this.description = description;
+        this.notes = notes;
     }
 
     public int getExpenseId() {
@@ -45,20 +41,16 @@ public class Expense {
         this.expenseId = expenseId;
     }
 
+    public int getStudentId() { return studentId; }
+
+    public void setStudentId(int studentId) { this.studentId = studentId; }
+
     public String getExpenseName() {
         return expenseName;
     }
 
     public void setExpenseName(String expenseName) {
         this.expenseName = expenseName;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
     }
 
     public double getAmount() {
@@ -77,11 +69,7 @@ public class Expense {
         this.expenseDate = expenseDate;
     }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getNotes() { return notes; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public void setNotes(String notes) { this.notes = notes; }
 }

@@ -15,19 +15,19 @@ public class ExpenseService {
     }
 
     // Add an expense
-    public void addExpense(String expenseName,
-            String category,
+    public void addExpense(int studentId,
+            String expenseName,
             double amount,
             Date expenseDate,
-            String description) {
+            String notes) {
 
-        if (expenseName == null || expenseName.trim().isEmpty()) {
-            System.out.println("Expense name cannot be empty.");
+        if (studentId <= 0) {
+            System.out.println("Student ID must be greater than zero.");
             return;
         }
 
-        if (category == null || category.trim().isEmpty()) {
-            System.out.println("Category cannot be empty.");
+        if (expenseName == null || expenseName.trim().isEmpty()) {
+            System.out.println("Expense name cannot be empty.");
             return;
         }
 
@@ -42,19 +42,18 @@ public class ExpenseService {
         }
 
         Expense expense = new Expense(
+                studentId,
                 expenseName.trim(),
-                category.trim(),
                 amount,
                 expenseDate,
-                description == null ? "" : description.trim());
+                notes == null ? "" : notes.trim());
 
         expenseDAO.addExpense(expense);
     }
 
     // View all expenses
     public void viewAllExpenses() {
-
-        List<Expense> expenses = expenseDAO.getAllExpenses();
+        List<Expense> expenses = getAllExpenses();
 
         if (expenses.isEmpty()) {
             System.out.println("No expenses found.");
@@ -67,36 +66,40 @@ public class ExpenseService {
 
             System.out.println("Expense ID  : " + expense.getExpenseId());
             System.out.println("Name        : " + expense.getExpenseName());
-            System.out.println("Category    : " + expense.getCategory());
+            System.out.println("Student ID  : " + expense.getStudentId());
             System.out.println("Amount      : ₹" + expense.getAmount());
             System.out.println("Date        : " + expense.getExpenseDate());
-            System.out.println("Description : " + expense.getDescription());
+            System.out.println("Notes       : " + expense.getNotes());
             System.out.println("-------------------------------------");
         }
 
         System.out.println("Total Expenses: ₹" + expenseDAO.getTotalExpenses());
     }
 
+    public List<Expense> getAllExpenses() {
+        return expenseDAO.getAllExpenses();
+    }
+
     // Update an expense
     public void updateExpense(int expenseId,
+            int studentId,
             String expenseName,
-            String category,
             double amount,
             Date expenseDate,
-            String description) {
+            String notes) {
 
         if (expenseId <= 0) {
             System.out.println("Invalid expense ID.");
             return;
         }
 
-        if (expenseName == null || expenseName.trim().isEmpty()) {
-            System.out.println("Expense name cannot be empty.");
+        if (studentId <= 0) {
+            System.out.println("Student ID must be greater than zero.");
             return;
         }
 
-        if (category == null || category.trim().isEmpty()) {
-            System.out.println("Category cannot be empty.");
+        if (expenseName == null || expenseName.trim().isEmpty()) {
+            System.out.println("Expense name cannot be empty.");
             return;
         }
 
@@ -112,11 +115,11 @@ public class ExpenseService {
 
         Expense expense = new Expense(
                 expenseId,
+                studentId,
                 expenseName.trim(),
-                category.trim(),
                 amount,
                 expenseDate,
-                description == null ? "" : description.trim());
+                notes == null ? "" : notes.trim());
 
         expenseDAO.updateExpense(expense);
     }

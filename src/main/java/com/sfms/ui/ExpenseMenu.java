@@ -75,11 +75,11 @@ public class ExpenseMenu {
         try {
             System.out.println("\n--- Add Expense ---");
 
+            System.out.print("Enter student ID: ");
+            int studentId = Integer.parseInt(scanner.nextLine());
+
             System.out.print("Enter expense name: ");
             String name = scanner.nextLine();
-
-            System.out.print("Enter category (Academic/Event/Other): ");
-            String category = scanner.nextLine();
 
             System.out.print("Enter amount: ");
             double amount = Double.parseDouble(scanner.nextLine());
@@ -87,10 +87,10 @@ public class ExpenseMenu {
             System.out.print("Enter date (YYYY-MM-DD): ");
             Date date = Date.valueOf(scanner.nextLine());
 
-            System.out.print("Enter description: ");
-            String description = scanner.nextLine();
+            System.out.print("Enter notes: ");
+            String notes = scanner.nextLine();
 
-            service.addExpense(name, category, amount, date, description);
+            service.addExpense(studentId, name, amount, date, notes);
 
         } catch (NumberFormatException e) {
             System.out.println("Invalid amount. Please enter a number.");
@@ -107,11 +107,11 @@ public class ExpenseMenu {
             System.out.print("Enter expense ID: ");
             int id = Integer.parseInt(scanner.nextLine());
 
+            System.out.print("Enter student ID: ");
+            int studentId = Integer.parseInt(scanner.nextLine());
+
             System.out.print("Enter new expense name: ");
             String name = scanner.nextLine();
-
-            System.out.print("Enter new category: ");
-            String category = scanner.nextLine();
 
             System.out.print("Enter new amount: ");
             double amount = Double.parseDouble(scanner.nextLine());
@@ -119,11 +119,11 @@ public class ExpenseMenu {
             System.out.print("Enter new date (YYYY-MM-DD): ");
             Date date = Date.valueOf(scanner.nextLine());
 
-            System.out.print("Enter new description: ");
-            String description = scanner.nextLine();
+            System.out.print("Enter new notes: ");
+            String notes = scanner.nextLine();
 
             service.updateExpense(
-                    id, name, category, amount, date, description);
+                    id, studentId, name, amount, date, notes);
 
         } catch (NumberFormatException e) {
             System.out.println("Invalid number entered.");
